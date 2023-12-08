@@ -1,30 +1,23 @@
 <?php
 /**
  * @var DataProviderInterface $dataProvider
- * @var BookSearch $searchModel
+ * @var AuthorSummarySearch $searchModel
  */
 
 use app\models\Author;
-use app\search\BookSearch;
+use app\models\Book;
+use app\search\AuthorSummarySearch;
 use yii\bootstrap5\Html;
 use yii\data\DataProviderInterface;
-use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
-$this->title = 'Authors';
+$this->title = 'Authors summary';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="author-index">
+<div class="author-summary">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
-    <?php if (!Yii::$app->user->isGuest): ?>
-        <p>
-            <?= Html::a('Add author', ['create'], ['class' => 'btn btn-success']) ?>
-            <?= Html::a('Summary', ['summary'], ['class' => 'btn btn-success']) ?>
-        </p>
-    <?php endif; ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -35,20 +28,21 @@ $this->params['breadcrumbs'][] = $this->title;
             'surname',
             'patronymic',
             [
+                'attribute' => 'year',
+                'value' => fn($model) => $model->yearCounter,
+            ],
+            [
                 'attribute' => 'books',
                 'format' => 'raw',
-                'value' => function ($model) {
+                'value' => function ($model) use ($searchModel) {
                     $response = [];
                     /** @var Author $model */
-                    foreach ($model->books as $book) {
+                    foreach ($model->getBooks()->andWhere(['year' => $searchModel->year])->all() as $book) {
+                        /** @var Book $book */
                         $response[] = '<p>' . Html::a(trim($book->title), ['/book/view', 'id' => $book->id]) . '</p>';
                     }
                     return implode("\n", $response);
                 },
-            ],
-            [
-                'class' => ActionColumn::class,
-                'template' => Yii::$app->user->isGuest ? '{view}' : '{view} {update} {delete}',
             ],
         ],
     ]); ?>

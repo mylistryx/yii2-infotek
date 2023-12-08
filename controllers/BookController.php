@@ -6,20 +6,44 @@ use app\components\controllers\WebController;
 use app\forms\ImageForm;
 use app\models\AuthorSubscribe;
 use app\models\Book;
+use app\search\BookSearch;
+use Throwable;
 use yii\base\Exception;
 use yii\data\ActiveDataProvider;
+use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
 
 final class BookController extends WebController
 {
+    public function behaviors(): array
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['create', 'update', 'delete'],
+                'rules' => [
+                    [
+                        'actions' => ['create', 'update', 'delete'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex(): Response
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Book::find(),
+        $searchModel = new BookSearch();
+        $dataProvider = $searchModel->search($this->queryParams());
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
-        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     /**
@@ -31,18 +55,17 @@ final class BookController extends WebController
         return $this->render('view', ['model' => $model]);
     }
 
-    /**
-     * @throws Exception
-     */
     public function actionCreate(): Response
     {
         $model = new Book();
         $imageModel = new ImageForm(['type' => ImageForm::TYPE_BOOK_COVER]);
-
-        if ($model->load($this->post()) && $model->save()) {
+        if ($model->load($this->post()) && $model->validate()) {
             $imageModel->imageFile = UploadedFile::getInstance($imageModel, 'imageFile');
-            $imageModel->upload();
-            $model->image = $imageModel->getFileName();
+
+            if ($imageModel->upload()) {
+                $model->image = $imageModel->getFileName();
+            }
+            $model->save(false);
 
             return $this
                 ->success('Book created')
@@ -56,25 +79,22 @@ final class BookController extends WebController
     }
 
     /**
-     * @param int|string $id
-     * @return Response
      * @throws NotFoundHttpException
-     * @throws Exception
      */
     public function actionUpdate(int|string $id): Response
     {
         $model = $this->findModel($id);
         $imageModel = new ImageForm(['type' => ImageForm::TYPE_BOOK_COVER]);
-
-        if ($model->load($this->post()) && $model->save()) {
-
+        if ($model->load($this->post()) && $model->validate()) {
             $imageModel->imageFile = UploadedFile::getInstance($imageModel, 'imageFile');
-            $imageModel->upload();
-            $model->image = $imageModel->getFileName();
 
+            if ($imageModel->upload()) {
+                $model->image = $imageModel->getFileName();
+            }
+            $model->save(false);
 
             return $this
-                ->success('Book updated')
+                ->success('Book created')
                 ->redirect(['view', 'id' => $model->id]);
         }
 
@@ -84,14 +104,16 @@ final class BookController extends WebController
         ]);
     }
 
-    public function actionSubscribe(int|string $id): Response
+    /**
+     * @throws NotFoundHttpException
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
+    public function actionDelete(int|string $id): Response
     {
-        $model = new AuthorSubscribe();
-        if ($model->load($this->post()) && $model->save()) {
-            return $this->success('Subscribe success')->redirect('index');
-        }
-
-        return $this->render('subscribe');
+        $model = $this->findModel($id);
+        $model->delete();
+        return $this->warning('Book deleted')->redirect(['index']);
     }
 
     /**

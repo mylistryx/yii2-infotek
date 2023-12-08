@@ -15,13 +15,20 @@ use yii\widgets\ActiveForm;
 ?>
 
 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
+    <div class="row">
+        <div class="col-4">
+            <?= $form->field($model, 'name')->textInput(['autofocus' => true]) ?>
+        </div>
+        <div class="col-4">
+            <?= $form->field($model, 'surname')->textInput() ?>
+        </div>
+        <div class="col-4">
+            <?= $form->field($model, 'patronymic')->textInput() ?>
+        </div>
 
-<?= $form->field($model, 'name')->textInput() ?>
-<?= $form->field($model, 'surname')->textarea() ?>
-<?= $form->field($model, 'patronymic') ?>
+        <?= $form->field($imageModel, 'imageFile')->fileInput(['accept' => 'image/*']) ?>
 
-<?= $form->field($imageModel, 'imageFile')->fileInput() ?>
-
-<?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update') ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => ['btn', 'btn-success']]) ?>
+    </div>
 
 <?php ActiveForm::end() ?>

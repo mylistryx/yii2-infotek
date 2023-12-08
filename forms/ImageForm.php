@@ -19,6 +19,7 @@ class ImageForm extends Model
     ];
     public const ALLOWED_EXTENSIONS = ['png', 'jpg'];
     public ?UploadedFile $imageFile = null;
+
     public ?int $type = null;
 
     private ?string $fileName = null;
@@ -31,16 +32,19 @@ class ImageForm extends Model
         ];
     }
 
-    /**
-     * @throws Exception
-     */
     public function upload(): bool
     {
+        if (empty($this->imageFile)) {
+            return false;
+        }
+
         if ($this->validate()) {
-            $filename = $this->filename ?? md5(Yii::$app->security->generateRandomString() . time()) . '.' . $this->imageFile->extension;
-            $storage = Yii::getAlias('@storage') . self::TYPE_FOLDERS[$this->type];
-            $path = FileHelper::normalizePath($storage . DIRECTORY_SEPARATOR . $filename);
-            $this->imageFile->saveAs($path);
+            $this->fileName = md5_file($this->imageFile->tempName) . '.' . $this->imageFile->extension;
+            $storage = Yii::getAlias('@storage') . DIRECTORY_SEPARATOR . self::TYPE_FOLDERS[$this->type];
+            $path = FileHelper::normalizePath($storage . DIRECTORY_SEPARATOR . $this->fileName);
+            if (!file_exists($path)) {
+                $this->imageFile->saveAs($path);
+            }
             return true;
         } else {
             return false;

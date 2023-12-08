@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\forms\ImageForm;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -12,10 +13,14 @@ use yii\db\ActiveRecord;
  * @property null|string $patronymic
  * @property null|string $image
  * @property-read ActiveQuery $bookAuthors
- * @property-read ActiveQuery $books
+ * @property-read ActiveQuery|array|AuthorSubscribe[] $subscribers
+ * @property-read ActiveQuery|array|Book[] $books
+ * @property-read string $fullName
  */
 class Author extends ActiveRecord
 {
+    public const TYPE = ImageForm::TYPE_AUTHOR_PHOTO;
+
     public static function tableName(): string
     {
         return '{{%author}}';
@@ -39,6 +44,16 @@ class Author extends ActiveRecord
 
     public function getBookAuthors(): ActiveQuery
     {
-        $this->hasMany(BookAuthor::class, ['author_id' => 'id']);
+        return $this->hasMany(BookAuthor::class, ['author_id' => 'id']);
+    }
+
+    public function getSubscribers(): ActiveQuery
+    {
+        return $this->hasMany(AuthorSubscribe::class, ['author_id' => 'id']);
+    }
+
+    public function getFullName(): string
+    {
+        return trim(implode(' ', [$this->surname, $this->name, $this->patronymic]));
     }
 }
