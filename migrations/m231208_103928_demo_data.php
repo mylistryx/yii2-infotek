@@ -89,8 +89,12 @@ class m231208_103928_demo_data extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeDown()
+    public function safeDown(): void
     {
-
+        $this->truncateTable('author_subscribe');
+        $this->truncateTable('book_author');
+        $this->truncateTable('book');
+        $this->truncateTable('author');
+        $this->truncateTable('identity');
     }
 }
