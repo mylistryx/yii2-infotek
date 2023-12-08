@@ -25,10 +25,12 @@ use yii\widgets\ActiveForm;
         <div class="col-4">
             <?= $form->field($model, 'patronymic')->textInput() ?>
         </div>
-
-        <?= $form->field($imageModel, 'imageFile')->fileInput(['accept' => 'image/*']) ?>
-
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => ['btn', 'btn-success']]) ?>
+        <div class="col-12">
+            <?= $form->field($imageModel, 'imageFile')->fileInput(['accept' => 'image/*']) ?>
+        </div>
+        <div class="col-12">
+            <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => ['btn', 'btn-success']]) ?>
+        </div>
     </div>
 
 <?php ActiveForm::end() ?>
