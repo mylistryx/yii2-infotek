@@ -36,19 +36,11 @@ class AuthorSummarySearch extends Author
 
         $this->load($params);
 
-//        if (!$this->validate()) {
-//            $query->where('0=1');
-//        }
+        if (!$this->validate()) {
+            $query->where('0=1');
+        }
 
         $query->andFilterWhere(['year' => $this->year]);
-
-
-//
-//        echo $query->createCommand()
-//            ->rawSql;
-//
-//        die();
-
 
         return $dataProvider;
     }
