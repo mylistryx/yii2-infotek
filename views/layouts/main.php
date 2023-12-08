@@ -43,9 +43,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav me-auto'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Books', 'url' => ['/book/index']],
-            ['label' => 'Authors', 'url' => ['/author/index']],
+            ['label' => 'Home', 'url' => ['/site/index'], 'active' => Yii::$app->controller->id == 'site'],
+            ['label' => 'Books', 'url' => ['/book/index'], 'active' => Yii::$app->controller->id == 'book'],
+            ['label' => 'Authors', 'url' => ['/author/index'], 'active' => Yii::$app->controller->id == 'author' && Yii::$app->controller->action->id != 'summary'],
+            ['label' => 'Summary', 'url' => ['/author/summary'], 'active' => Yii::$app->controller->id == 'author' && Yii::$app->controller->action->id == 'summary'],
         ],
     ]);
 

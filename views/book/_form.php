@@ -1,7 +1,6 @@
 <?php
 
 use app\forms\ImageForm;
-use app\models\Author;
 use app\models\Book;
 use yii\bootstrap5\Html;
 use yii\web\View;
