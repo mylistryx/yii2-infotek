@@ -25,6 +25,7 @@ class m231207_121947_book extends Migration
             'image' => $this->string()->null(),
         ]);
 
+        $this->createIndex('IDX_Book_Year', $this->table, ['year']);
     }
 
     /**
