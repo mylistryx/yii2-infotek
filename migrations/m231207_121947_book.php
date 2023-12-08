@@ -33,7 +33,7 @@ class m231207_121947_book extends Migration
      */
     public function safeDown(): void
     {
-
+        $this->dropIndex('IDX_Book_Year', $this->table);
         $this->dropTable($this->table);
     }
 }

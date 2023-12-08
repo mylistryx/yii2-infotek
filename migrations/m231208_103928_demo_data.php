@@ -91,12 +91,18 @@ class m231208_103928_demo_data extends Migration
      */
     public function down(): void
     {
-        Yii::$app->db->createCommand('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;')->execute();
+        if ($this->db->driverName === 'mysql') {
+            Yii::$app->db->createCommand('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;')->execute();
+        }
+
         $this->truncateTable('author_subscribe');
         $this->truncateTable('book_author');
         $this->truncateTable('book');
         $this->truncateTable('author');
         $this->truncateTable('identity');
-        Yii::$app->db->createCommand('SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1)')->execute();
+
+        if ($this->db->driverName === 'mysql') {
+            Yii::$app->db->createCommand('SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1)')->execute();
+        }
     }
 }
