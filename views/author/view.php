@@ -35,9 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     $attributes = [
         [
-            'value' => fn($model) => trim(implode(' ', [$model->surname, $model->name, $model->patronymic])),
-        ],
-        [
             'attribute' => 'image',
             'format' => 'raw',
             /** @var Book $model */
