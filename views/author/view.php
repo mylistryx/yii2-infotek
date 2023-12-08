@@ -35,7 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     $attributes = [
         [
-            'label' => 'Name',
             'value' => fn($model) => trim(implode(' ', [$model->surname, $model->name, $model->patronymic])),
         ],
         [
