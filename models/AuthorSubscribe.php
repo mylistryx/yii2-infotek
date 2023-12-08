@@ -2,11 +2,15 @@
 
 namespace app\models;
 
-use udokmeci\yii2PhoneValidator\PhoneValidator;
-use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
+/**
+ * @property string $phone
+ * @property int $author_id
+ * @property-read ActiveQuery|null|Author $author
+ */
 class AuthorSubscribe extends ActiveRecord
 {
     public static function tableName(): string
@@ -20,6 +24,7 @@ class AuthorSubscribe extends ActiveRecord
             'TimeStamp' => [
                 'class' => TimestampBehavior::class,
                 'value' => date('Y-m-d H:i:s'),
+                'updatedAtAttribute' => false,
             ],
         ];
     }
@@ -28,8 +33,7 @@ class AuthorSubscribe extends ActiveRecord
     {
         return [
             [['author_id', 'phone'], 'required'],
-            ['author_id', 'exists', 'targetClass' => Author::class, 'targetAttribute' => 'id'],
-            [['phone'], PhoneValidator::class, 'country' => 'RU'],
+            ['author_id', 'exist', 'targetClass' => Author::class, 'targetAttribute' => 'id'],
             ['phone', 'filterPhone'],
         ];
     }
@@ -39,5 +43,10 @@ class AuthorSubscribe extends ActiveRecord
         if (!$this->hasErrors()) {
             $this->$attribute = substr(preg_replace('/[^0-9]/', "", $this->$attribute), -10);
         }
+    }
+
+    public function getAuthor(): ActiveQuery
+    {
+        return $this->hasOne(Author::class, ['id' => 'author_id']);
     }
 }

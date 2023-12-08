@@ -46,7 +46,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'Books', 'url' => ['/book/index']],
             ['label' => 'Authors', 'url' => ['/author/index']],
-            ['label' => 'Subscriptions', 'url' => ['/book-subscribe/index']],
         ],
     ]);
 

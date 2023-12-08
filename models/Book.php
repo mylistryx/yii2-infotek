@@ -2,8 +2,13 @@
 
 namespace app\models;
 
-use yii\behaviors\TimestampBehavior;
+use app\forms\ImageForm;
+use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
+use yii\db\StaleObjectException;
+use yii\helpers\ArrayHelper;
 
 /**
  * @property integer $id
@@ -12,9 +17,17 @@ use yii\db\ActiveRecord;
  * @property string $description [text]
  * @property string $year [year]
  * @property string $isbn [varchar(20)]
+ * @property-read ActiveQuery|array|Author[] $authors
+ * @property-read ActiveQuery|array|BookAuthor $bookAuthors
+ * @property-read array $allAuthors
+ * @property-read array $yearsRange
  */
 class Book extends ActiveRecord
 {
+    public const TYPE = ImageForm::TYPE_BOOK_COVER;
+
+    public array $selectedAuthors = [];
+
     public static function tableName(): string
     {
         return '{{%book}}';
@@ -25,11 +38,51 @@ class Book extends ActiveRecord
         return [
             [['title', 'description', 'year', 'isbn'], 'required'],
             ['year', 'string', 'length' => [4, 4]],
-            ['year', 'in', 'range' => range(1500, date('Y') + 1)],
+            ['year', 'in', 'range' => $this->yearsRange],
             [['title'], 'string', 'length' => [3, 120]],
             [['description'], 'string'],
             ['isbn', 'normalizeAndValidateISBN'],
+            ['selectedAuthors', 'required'],
+            ['selectedAuthors', 'each', 'rule' => ['integer']],
         ];
+    }
+
+    public function attributeLabels(): array
+    {
+        return [
+            'isbn' => 'ISBN',
+        ];
+    }
+
+    public function afterFind(): void
+    {
+        parent::afterFind();
+        /** @var Author $model */
+        $this->selectedAuthors = BookAuthor::find()->select('author_id')->where(['book_id' => $this->id])->column();
+    }
+
+    /**
+     * @throws Exception
+     * @throws StaleObjectException
+     */
+    public function afterSave($insert, $changedAttributes): void
+    {
+        $exists = ArrayHelper::map($this->bookAuthors, 'author_id', 'author_id');
+
+        $removeAuthors = array_diff($exists, $this->selectedAuthors);
+
+        $newAuthors = array_diff($this->selectedAuthors, $exists);
+
+        foreach (Author::findAll(['id' => $removeAuthors]) as $author) {
+            $this->unlink('authors', $author, true);
+        }
+
+        foreach (Author::findAll(['id' => $newAuthors]) as $author) {
+            $this->link('authors', $author);
+            Yii::$app->sms->informSubscribers($author, $this);
+        }
+
+
     }
 
     public function normalizeAndValidateISBN(string $attribute): void
@@ -57,5 +110,33 @@ class Book extends ActiveRecord
                 $this->addError($attribute, 'Incorrect ISBN code!');
             }
         }
+    }
+
+    public function getAuthors(): ActiveQuery
+    {
+        return $this->hasMany(Author::class, ['id' => 'author_id'])->via('bookAuthors');
+    }
+
+    public function getBookAuthors(): ActiveQuery
+    {
+        return $this->hasMany(BookAuthor::class, ['book_id' => 'id']);
+    }
+
+    public function getYearsRange(): array
+    {
+        static $range = [];
+        if (empty($range)) {
+            foreach (range(date('Y') + 10, 1500) as $item) {
+                $range[$item] = $item;
+            }
+        }
+
+        return $range;
+    }
+
+    public function getAllAuthors(): array
+    {
+        /** @var Author $model */
+        return ArrayHelper::map(Author::find()->all(), 'id', 'fullName');
     }
 }

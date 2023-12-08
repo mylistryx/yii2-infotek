@@ -1,10 +1,13 @@
 <?php
 
+use app\components\sms\SmsInterface;
+use app\components\sms\SmsPilot;
 use app\models\Identity;
 use yii\caching\FileCache;
 use yii\debug\Module as DebugModule;
 use yii\gii\Module as GiiModule;
 use yii\log\FileTarget;
+use yii\rbac\PhpManager;
 use yii\symfonymailer\Mailer;
 
 $params = require __DIR__ . '/params.php';
@@ -18,7 +21,7 @@ $config = [
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
-        '@storage' => '@app/storage',
+        '@storage' => '@app/web/storage',
     ],
     'components' => [
         'request' => [
@@ -37,7 +40,6 @@ $config = [
         'mailer' => [
             'class' => Mailer::class,
             'viewPath' => '@app/mail',
-            // send all mails to a file by default.
             'useFileTransport' => true,
         ],
         'log' => [
@@ -54,6 +56,14 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => require 'rules.php',
+        ],
+        'sms' => [
+            'class' => SmsPilot::class,
+            'apiKey' => 'Y16654O63HUMQ60L15GY389K4RUATG3Q83NF7JJL4P68G0VD108LI65B5A26XFL1',
+        ],
+        'authManager' => [
+            'class' => PhpManager::class,
+            'defaultRoles' => ['admin', 'user'],
         ],
     ],
     'params' => $params,

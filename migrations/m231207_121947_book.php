@@ -18,11 +18,11 @@ class m231207_121947_book extends Migration
     {
         $this->createTable($this->table, [
             'id' => $this->primaryKey(),
-            'image' => $this->string()->null(),
             'title' => $this->string(120)->notNull(),
-            'description' => $this->text()->null(),
-            'year' => $this->string(4)->notNull(),
+            'description' => $this->text()->notNull(),
+            'year' => 'YEAR NOT NULL',
             'isbn' => $this->string(20)->notNull(),
+            'image' => $this->string()->null(),
         ]);
 
     }

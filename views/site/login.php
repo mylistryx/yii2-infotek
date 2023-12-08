@@ -49,8 +49,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php ActiveForm::end(); ?>
 
             <div style="color:#999;">
-                You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-                To modify the username/password, please check out the code <code>app\models\User::$users</code>.
+                You may login with
+                <strong>user1@example.com/123123123</strong>
+                <br><strong>user2@example.com/123123123</strong> or
+                <br><strong>user3@example.com/123123123</strong> or
+                <br>To create new user use console command: <br><strong>yii identity/create email password</strong>
             </div>
 
         </div>
