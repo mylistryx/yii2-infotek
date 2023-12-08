@@ -50,9 +50,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div style="color:#999;">
                 You may login with
-                <strong>user1@example.com/123123123</strong>
-                <br><strong>user2@example.com/123123123</strong> or
-                <br><strong>user3@example.com/123123123</strong> or
+                <strong>user1@mail.com/123123123</strong>
+                <br><strong>user2@mail.com/123123123</strong> or
+                <br><strong>user3@mail.com/123123123</strong> or
                 <br>To create new user use console command: <br><strong>yii identity/create email password</strong>
             </div>
 
